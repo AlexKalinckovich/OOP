@@ -5,13 +5,13 @@ import javafx.stage.Stage;
 import org.example.oop.Figures.*;
 import org.example.oop.FiguresView.FigureView;
 
+import java.net.MalformedURLException;
 import java.util.List;
 
 public class FigureApplication extends Application {
     @Override
-    public void start(Stage stage) {
-        // Создаем коллекцию фигур
-        List<Figure> figures = List.of(
+    public void start(final Stage stage) throws MalformedURLException {
+        final List<Figure> figures = List.of(
                 new LineFigure(),
                 new TriangleFigure(),
                 new RectangleFigure(),

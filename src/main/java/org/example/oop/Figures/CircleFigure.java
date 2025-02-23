@@ -1,37 +1,26 @@
 package org.example.oop.Figures;
 
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.shape.Circle;
+import org.example.oop.FigureInterfaces.MouseDrawable;
 
 import java.util.List;
 
-public class CircleFigure extends Figure{
-
+public class CircleFigure extends Figure implements MouseDrawable {
     private final int CIRCLE_PARAMETERS_COUNT = 3;
-    private final Circle originalCircle = new Circle();
-
-
-    public CircleFigure() {
-        drawable = originalCircle;
-    }
 
     @Override
-    protected Node createDrawableCopy() {
+    public Node getDrawable(final double... params) throws IllegalArgumentException {
+        if(params.length != CIRCLE_PARAMETERS_COUNT) throw new IllegalArgumentException();
+        this.params = params;
         final Circle circle = new Circle();
-        circle.setRadius(originalCircle.getRadius());
-        circle.setCenterX(originalCircle.getCenterX());
-        circle.setCenterY(originalCircle.getCenterY());
+        applyStyle(circle);
+        circle.setCenterX(params[0]);
+        circle.setCenterY(params[1]);
+        circle.setRadius(params[2]);
         return circle;
     }
-
-    @Override
-    public void updateParameters(double[] parameters) {
-        if(parameters.length != CIRCLE_PARAMETERS_COUNT) throw new IllegalArgumentException();
-        originalCircle.setCenterX(parameters[0]);
-        originalCircle.setCenterY(parameters[1]);
-        originalCircle.setRadius(parameters[2]);
-    }
-
 
     @Override
     public int getParameterCount() { return CIRCLE_PARAMETERS_COUNT; }
@@ -39,5 +28,23 @@ public class CircleFigure extends Figure{
     @Override
     public String[] getParameterNames() {
         return new String[]{"Center X", "Center Y", "Radius"};
+    }
+
+    @Override
+    public InteractionType getInteractionType() {
+        return InteractionType.DRAG;
+    }
+
+    @Override
+    public Node createFromMousePoints(final List<Point2D> points) throws IllegalArgumentException {
+        if (points.size() != 2) throw new IllegalArgumentException("Exactly 2 points required");
+        final Point2D center = points.getFirst();
+        final double radius = center.distance(points.get(1));
+        return getDrawable(center.getX(), center.getY(), radius);
+    }
+
+    @Override
+    public int getPointsCount() {
+        return -1;
     }
 }

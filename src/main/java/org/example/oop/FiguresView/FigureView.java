@@ -1,130 +1,105 @@
 package org.example.oop.FiguresView;
 
-import javafx.geometry.Bounds;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import org.example.oop.Figures.Figure;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.stage.FileChooser;
+import org.example.oop.Figures.Figure;
+import org.example.oop.Models.DrawStrategy.DrawStrategy;
+import org.example.oop.Models.Factories.StrategyFactory;
+import org.example.oop.Models.Factories.UIFactory;
+import org.example.oop.Models.Files.FileManager;
+import org.example.oop.Models.PrintingClasses.MessageController;
+import org.example.oop.Models.Settings.FigureSettings;
+import org.example.oop.Models.ValidationClasses.ParametersValidator;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class FigureView {
     private final Map<String, Figure> figureTypes;
+    private final MessageController messageController = new MessageController();
+    private final ParametersValidator parametersValidator = new ParametersValidator(messageController);
+    private final FigureSettings settings = new FigureSettings();
+    private final Stack<Node> drawingHistory = new Stack<>();
+    private final ToggleGroup drawModeGroup = new ToggleGroup();
+    private final RadioButton coordRadio = new RadioButton("By Coordinates");
+    private final RadioButton mouseRadio = new RadioButton("By Mouse");
+
+
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private  ComboBox<String> figureSelector;
+
+    private  Button drawButton;
+    private  Button resetButton;
+
+
+    private  BorderPane rootLayout;
+    private  GridPane inputArea;
+
+    private ToolBar toolBar;
+
     private Figure currentFigure;
     private Pane drawingArea;
-    private final GridPane inputArea;
     private TextField[] parameterFields;
-
-    private final ComboBox<String> figureSelector;
-    private final Button drawButton;
-    private final Button resetButton;
-    private final BorderPane rootLayout;
-
-    private Pane drawingContainer;
     private Canvas gridCanvas;
 
-    // Конструктор принимает коллекцию фигур для отображения
-    public FigureView(Collection<Figure> figures) {
-        this.figureTypes = new HashMap<>();
-        figures.forEach(f -> figureTypes.put(f.getClass().getSimpleName(), f));
+    private DrawStrategy currentDrawStrategy;
 
-        // Инициализация компонентов
-        this.rootLayout = new BorderPane();
-        this.drawingArea = createDrawingArea();
-        this.inputArea = new GridPane();
-        this.figureSelector = comboBoxInit();
-        this.drawButton = buttonsInit();
-        this.resetButton = buttonsInit();
-
-        // Настройка корневого лэйаута
+    public FigureView(final Collection<Figure> figures) {
+        this.figureTypes = figures.stream()
+                .collect(Collectors.toMap(f -> f.getClass().getSimpleName(), f -> f));
+        initializeComponents();
+        setDefaultFigure();
         setupRootLayout();
+        initDrawStrategies();
+        setupDrawModeSwitcher();
     }
 
-    // Метод для получения готового Scene
-    public Scene getScene() {
-        return new Scene(rootLayout, 800, 600);
+    private void setDefaultFigure() {
+        final String defaultFigureName = figureTypes.keySet().iterator().next();
+        figureSelector.getSelectionModel().select(defaultFigureName);
+        figureSelector.setOnAction(_ -> updateCurrentFigure());
+        updateCurrentFigure();
     }
 
-    private void setupRootLayout() {
-        // Панель управления с элементами ввода
-        final VBox controlPanel = new VBox(10);
-        controlPanel.setPadding(new Insets(15));
-        controlPanel.setStyle("-fx-background-color: #f0f0f0;");
+    private void updateCurrentFigure() {
+        final String selectedFigureName = figureSelector.getValue();
+        if(figureTypes.containsKey(selectedFigureName)) {
+            currentFigure = figureTypes.get(selectedFigureName);
+        }else{
+            throw new IllegalStateException();
+        }
 
-        // Добавляем компоненты
-        controlPanel.getChildren().addAll(
-                createTitle("Figure Drawer"),
-                figureSelector,
-                inputArea,
-                createButtonPanel()
-        );
+        // Надо автоматически поменять стратегию, не дожидаясь нажатия на кнопку "Draw"
+        if(mouseRadio.isSelected()) {
+            drawFigure();
+        }
 
-        rootLayout.setLeft(controlPanel);
-        rootLayout.setCenter(drawingArea);
+        updateInputFields(currentFigure);
     }
 
-    // Инициализация ComboBox
-    private ComboBox<String> comboBoxInit() {
-        /*
-         * FXCollections.observableArrayList - создает ObservableList,
-         * который автоматически обновляет ComboBox при изменениях
-         *
-         * getSelectionModel().selectFirst() - выбирает первый элемент в списке
-         *
-         * setOnAction - обработчик изменения выбора
-         */
-        final ObservableList<String> items = FXCollections.observableArrayList(figureTypes.keySet());
-        final ComboBox<String> combo = new ComboBox<>(items);
-        combo.getSelectionModel().selectFirst();
-        combo.setStyle("-fx-font: 14px 'Arial';");
-        combo.setOnAction(_ -> updateInputFields(
-                figureTypes.get(combo.getValue())
-        ));
-        return combo;
-    }
-
-    // Инициализация кнопок
-    private Button buttonsInit() {
-        /*
-         * setStyle - устанавливает CSS стили для компонента
-         * setPrefWidth - задает предпочтительную ширину
-         * setOnAction - обработчик клика
-         */
-        final Button btn = new Button();
-        btn.setPrefWidth(120);
-        btn.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;");
-        return btn;
-    }
-
-    // Обновление полей ввода при выборе фигуры
     private void updateInputFields(final Figure figure) {
-        /*
-         * getChildren().clear() - очищает все дочерние элементы GridPane
-         * addRow() - добавляет строку с компонентами в GridPane
-         */
         inputArea.getChildren().clear();
         inputArea.setVgap(8);
         inputArea.setHgap(8);
         inputArea.setPadding(new Insets(10));
 
-        currentFigure = figure;
         final int paramCount = figure.getParameterCount();
         parameterFields = new TextField[paramCount];
 
-        for(int i = 0; i < paramCount; i++) {
+        for (int i = 0; i < paramCount; i++) {
             final Label label = new Label(figure.getParameterNames()[i]);
             label.setStyle("-fx-font-weight: bold;");
 
@@ -136,156 +111,243 @@ public class FigureView {
         }
     }
 
-    // Создание области рисования
-    private Pane createDrawingArea() {
-        /*
-         * setStyle - CSS стили для области рисования
-         * setBorder - создает границу вокруг панели
-         */
-        drawingContainer = new Pane();
+    private void initializeComponents() {
+        this.rootLayout = new BorderPane();
+        this.drawingArea = createDrawingArea();
+        this.inputArea = (GridPane) UIFactory.createGridPane();
+        this.figureSelector = UIFactory.createComboBox(
+                FXCollections.observableArrayList(figureTypes.keySet())
+        );
+        this.drawButton = UIFactory.createButton("Draw", "-fx-background-color: #4CAF50; -fx-text-fill: white;");
+        this.resetButton = UIFactory.createButton("Reset", "-fx-background-color: #f44336; -fx-text-fill: white;");
+        this.toolBar = UIFactory.createToolBar();
+        setupSettingsPanel();
+        setupToolBar();
+    }
 
-        // Слой сетки
+    private void setupToolBar() {
+        final Button saveButton = UIFactory.createIconButton("save.png", "Сохранить");
+        saveButton.setOnAction(_ -> handleSave());
+
+        final Button loadButton = UIFactory.createIconButton("load.png", "Загрузить");
+        loadButton.setOnAction(_ -> handleLoad());
+
+        final Button undoButton = UIFactory.createIconButton("undo.png", "Отменить");
+        undoButton.setOnAction(_ -> handleUndo());
+
+        toolBar.getItems().addAll(saveButton, loadButton, undoButton);
+        rootLayout.setTop(toolBar);
+    }
+
+    private void handleUndo() {
+        if (!drawingHistory.isEmpty()) {
+            final Node lastFigure = drawingHistory.pop();
+            drawingArea.getChildren().removeIf(node -> node == lastFigure);
+        }
+    }
+
+    private void setupSettingsPanel() {
+        final ColorPicker fillColorPicker = new ColorPicker((Color) settings.getFillColor());
+        fillColorPicker.setOnAction(_ -> settings.setFillColor(fillColorPicker.getValue()));
+
+        final ColorPicker strokeColorPicker = new ColorPicker((Color) settings.getStrokeColor());
+        strokeColorPicker.setOnAction(_ -> settings.setStrokeColor(strokeColorPicker.getValue()));
+
+        final Spinner<Double> lineWidthSpinner = new Spinner<>(0.1, 10.0, settings.getStrokeWidth(), 0.5);
+        lineWidthSpinner.valueProperty().addListener((_, _, newVal) -> settings.setStrokeWidth(newVal));
+
+        final ComboBox<String> lineTypeCombo = new ComboBox<>(FXCollections.observableArrayList("Solid", "Dashed", "Dotted"));
+        lineTypeCombo.getSelectionModel().selectedItemProperty().addListener((_, _, newVal) -> {
+            switch (newVal) {
+                case "Dashed" -> settings.setDashPattern(List.of(5.0, 5.0));
+                case "Dotted" -> settings.setDashPattern(List.of(1.0, 3.0));
+                default -> settings.setDashPattern(null);
+            }
+        });
+
+        final VBox settingsPanel = new VBox(10,
+                new Label("Настройки стиля:"),
+                new HBox(10, new Label("Заливка:"), fillColorPicker),
+                new HBox(10, new Label("Обводка:"), strokeColorPicker),
+                new HBox(10, new Label("Толщина:"), lineWidthSpinner),
+                new HBox(10, new Label("Тип линии:"), lineTypeCombo)
+        );
+        settingsPanel.setPadding(new Insets(15));
+        settingsPanel.setStyle("-fx-background-color: #f8f8f8;");
+
+        rootLayout.setRight(settingsPanel);
+    }
+
+    private void setupRootLayout() {
+        final VBox controlPanel = new VBox(10);
+        controlPanel.setPadding(new Insets(15));
+        controlPanel.setStyle("-fx-background-color: #f0f0f0;");
+
+        controlPanel.getChildren().addAll(
+                UIFactory.createLabel("Figure Drawer", "-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333;"),
+                figureSelector,
+                inputArea,
+                createButtonPanel(),
+                createModeSwitcher()
+        );
+
+        rootLayout.setLeft(controlPanel);
+        rootLayout.setCenter(drawingArea);
+    }
+
+    private void initDrawStrategies() {
+        currentDrawStrategy = StrategyFactory.createStrategy(
+                StrategyFactory.StrategyType.COORDINATE,
+                parametersValidator,
+                messageController,
+                parameterFields,
+                drawingArea,
+                drawingHistory
+        );
+
+        coordRadio.setUserData(StrategyFactory.createStrategy(
+                StrategyFactory.StrategyType.COORDINATE,
+                parametersValidator,
+                messageController,
+                parameterFields,
+                drawingArea,
+                drawingHistory
+        ));
+
+        mouseRadio.setUserData(StrategyFactory.createStrategy(
+                StrategyFactory.StrategyType.MOUSE,
+                parametersValidator,
+                messageController,
+                parameterFields,
+                drawingArea,
+                drawingHistory
+        ));
+    }
+
+    private void setupDrawModeSwitcher() {
+        coordRadio.setToggleGroup(drawModeGroup);
+        mouseRadio.setToggleGroup(drawModeGroup);
+        coordRadio.setSelected(true);
+
+        mouseRadio.setOnAction(_ -> drawFigure());
+
+        drawModeGroup.selectedToggleProperty().addListener((_, _, newVal) -> {
+            if (newVal != null) {
+                currentDrawStrategy = (DrawStrategy) newVal.getUserData();
+                updateInputVisibility();
+            }
+        });
+    }
+
+    private void updateInputVisibility() {
+        boolean isCoordinateMode = coordRadio.isSelected();
+        inputArea.setVisible(isCoordinateMode);
+        inputArea.setManaged(isCoordinateMode);
+    }
+
+    private Pane createDrawingArea() {
+        final Pane drawingContainer = new Pane();
+
         gridCanvas = new Canvas();
         gridCanvas.setMouseTransparent(true);
         drawingContainer.getChildren().add(gridCanvas);
 
-        // Слой для фигур
         drawingArea = new Pane();
         drawingContainer.getChildren().add(drawingArea);
 
-        // Обработчики изменения размера
-        drawingContainer.widthProperty().addListener(_ -> {
-            gridCanvas.setWidth(drawingContainer.getWidth());
-            drawGrid();
-        });
-
-        drawingContainer.heightProperty().addListener(_ -> {
-            gridCanvas.setHeight(drawingContainer.getHeight());
+        drawingContainer.layoutBoundsProperty().addListener((_, _, newVal) -> {
+            gridCanvas.setWidth(newVal.getWidth());
+            gridCanvas.setHeight(newVal.getHeight());
             drawGrid();
         });
 
         return drawingContainer;
     }
 
+    private void handleSave() {
+        final FileChooser fileChooser = new FileChooser();
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON", "*.json"));
+        final File file = fileChooser.showSaveDialog(null);
+        if (file != null) {
+            executorService.submit(() -> {
+                try {
+                    FileManager.saveToFile(drawingHistory, file.toPath());
+                } catch (IOException e) {
+                    messageController.showAlert("File error","File not found");
+                }
+            });
+        }
+    }
+
+    private void handleLoad() {
+        final FileChooser fileChooser = new FileChooser();
+        final File file = fileChooser.showOpenDialog(null);
+        if (file != null) {
+            executorService.submit(() -> {
+                List<Node> figures;
+                try {
+                    figures = FileManager.loadFromFile(file.toPath())
+                            .stream()
+                            .map((Figure::getDrawable))
+                            .toList();
+                    Platform.runLater(() -> drawingArea.getChildren().setAll(figures));
+                } catch (IOException e) {
+                    messageController.showAlert("File error","File not found");
+                }
+            });
+        }
+    }
+
     private void drawGrid() {
         final GraphicsContext gc = gridCanvas.getGraphicsContext2D();
         gc.clearRect(0, 0, gridCanvas.getWidth(), gridCanvas.getHeight());
-
-        // Рисование осей
         gc.setStroke(Color.LIGHTGRAY);
         gc.setLineWidth(1);
 
-        // Вертикальные линии
         for (double x = 0; x < gridCanvas.getWidth(); x += 50) {
             gc.strokeLine(x, 0, x, gridCanvas.getHeight());
         }
 
-        // Горизонтальные линии
         for (double y = 0; y < gridCanvas.getHeight(); y += 50) {
             gc.strokeLine(0, y, gridCanvas.getWidth(), y);
         }
     }
 
-    // Создание панели с кнопками
     private HBox createButtonPanel() {
-        /*
-         * HBox - горизонтальный layout
-         * setSpacing - расстояние между элементами
-         */
         final HBox panel = new HBox(10);
-
-        drawButton.setText("Draw");
         drawButton.setOnAction(_ -> drawFigure());
-
-        resetButton.setText("Reset");
-        resetButton.setStyle("-fx-background-color: #f44336;");
         resetButton.setOnAction(_ -> {
-            drawingArea = createDrawingArea();
+            drawingArea.getChildren().clear();
+            drawingArea.getChildren().add(gridCanvas);
         });
 
         panel.getChildren().addAll(drawButton, resetButton);
         return panel;
     }
 
-    // Создание заголовка
-    private Label createTitle(String text) {
-        /*
-         * Label с CSS стилями для заголовка
-         */
-        final Label label = new Label(text);
-        label.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #333;");
-        return label;
+    private HBox createModeSwitcher() {
+        final HBox modePanel = new HBox(10, coordRadio, mouseRadio);
+        modePanel.setPadding(new Insets(10));
+        return modePanel;
     }
 
-    private List<String> getFieldsParams(){
-        return Arrays.stream(parameterFields)
-                .map(TextInputControl::getText)
-                .map(String::trim)
-                .flatMap(text -> Arrays.stream(text.split("\\s+")))
-                .filter(s -> !s.isEmpty())
-                .toList();
-    }
-
-    private boolean isCorrectCoordinates(final double[] params) {
-
-        if(params == null) return false;
-
-        final Bounds bounds = drawingArea.getLayoutBounds();
-        final int size = params.length;
-        for (int i = 0; i < size; i++) {
-            final double val = params[i];
-            if (i % 2 == 0 && (val < 0 || val > bounds.getWidth())) {
-                showAlert("Ошибка", "X координата выходит за пределы");
-                return false;
-            }
-            if (i % 2 == 1 && (val < 0 || val > bounds.getHeight())) {
-                showAlert("Ошибка", "Y координата выходит за пределы");
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private double[] parseParameters(List<String> params) throws NumberFormatException{
-        return params.stream()
-                .mapToDouble(Double::parseDouble)
-                .toArray();
-    }
-    // Отрисовка фигуры
     private void drawFigure() {
-        boolean isValid = true;
-        double[] params = null;
-        try {
-            params = parseParameters(getFieldsParams());
-        }catch (NumberFormatException e){
-            isValid = false;
-            showAlert("Invalid enters","Values must be numeric");
+        currentFigure.setSettings(settings);
+        Node temp = null;
+        var list = drawingArea.getChildren();
+        if(!list.isEmpty()){
+            temp = list.getLast();
         }
+        currentDrawStrategy.draw(currentFigure, drawingArea.getLayoutBounds());
 
-        if(isValid && isCorrectCoordinates(params)) {
-            final Figure figure = figureTypes.get(currentFigure.getClass().getSimpleName());
-            try {
-                figure.updateParameters(params);
-            } catch (IllegalArgumentException _) {
-                isValid = false;
-                showAlert("Invalid input", "Values must be numeric");
-            }
-            if(isValid) {
-                drawingArea.getChildren().add(figure.getDrawable());
-            }
+        if(temp != null && list.getLast() != temp){
+            drawingHistory.push(list.getLast());
         }
     }
 
-    // Показать диалоговое окно
-    private void showAlert(String title, String message) {
-        /*
-         * Alert - стандартное диалоговое окно
-         * AlertType.ERROR - тип окна (иконка ошибки)
-         */
-        final Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    public Scene getScene() {
+        return new Scene(rootLayout, 800, 600);
     }
+
+
 }
