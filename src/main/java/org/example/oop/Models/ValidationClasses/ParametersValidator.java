@@ -15,17 +15,10 @@ import java.util.Optional;
 
 public class ParametersValidator {
 
-    private final MessageController messageController;
-
-    public ParametersValidator(final MessageController messageController) {
-        this.messageController = messageController;
+    public ParametersValidator() {
     }
 
-    public ParametersValidator(){
-        this.messageController = new MessageController();
-    }
-
-    private List<String> getFieldsParams(final TextField[] parameterFields) throws NullPointerException {
+    private static List<String> getFieldsParams(final TextField[] parameterFields) throws NullPointerException {
         return  Arrays.stream(parameterFields)
                 .map(TextInputControl::getText)
                 .map(String::trim)
@@ -34,7 +27,7 @@ public class ParametersValidator {
                 .toList();
     }
 
-    public Optional<double[]> parseParameters(final TextField[] parameterFields){
+    public static Optional<double[]> parseParameters(final TextField[] parameterFields){
         Optional<double[]> result = Optional.empty();
         try {
             final List<String> params = getFieldsParams(parameterFields);
@@ -43,15 +36,15 @@ public class ParametersValidator {
                     .toArray());
 
         }catch (NumberFormatException _){
-            messageController.showAlert("Invalid enters","Values must be numeric");
+            MessageController.showAlert("Invalid enters","Values must be numeric");
         }catch (NullPointerException _) {
-            messageController.showAlert("Invalid figure",
+            MessageController.showAlert("Invalid figure",
                     "Choose one of the figures");
         }
         return result;
     }
 
-    public boolean isCorrectCoordinates(final double[] params, final Bounds bounds) {
+    public static boolean isCorrectCoordinates(final double[] params, final Bounds bounds) {
 
         if(params == null || params.length == 0) return false;
 
@@ -59,24 +52,24 @@ public class ParametersValidator {
         for (int i = 0; i < size; i++) {
             final double val = params[i];
             if (i % 2 == 0 && (val < 0 || val > bounds.getWidth())) {
-                messageController.showAlert("Ошибка", "X координата выходит за пределы");
+                MessageController.showAlert("Ошибка", "X координата выходит за пределы");
                 return false;
             }
             if (i % 2 == 1 && (val < 0 || val > bounds.getHeight())) {
-                messageController.showAlert("Ошибка", "X координата выходит за пределы");
+                MessageController.showAlert("Ошибка", "X координата выходит за пределы");
                 return false;
             }
         }
         return true;
     }
 
-    public boolean isPointOutOfBounds(double x, double y, final Bounds bounds) {
+    public static boolean isPointOutOfBounds(double x, double y, final Bounds bounds) {
         return  x <= bounds.getMinX() || x >= bounds.getMaxX() ||
                 y <= bounds.getMinY() || y >= bounds.getMaxY();
     }
 
 
-    public boolean isFigureInBounds(final List<Point2D> points, final Bounds bounds, final Figure figure) {
+    public static boolean isFigureInBounds(final List<Point2D> points, final Bounds bounds, final Figure figure) {
         boolean result = true;
         if (figure instanceof CircleFigure) {
             final Point2D first = points.getFirst();

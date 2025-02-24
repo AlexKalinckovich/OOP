@@ -8,8 +8,15 @@ import org.example.oop.FigureInterfaces.MouseDrawable;
 
 import java.util.List;
 
-public class RectangleFigure extends Figure implements MouseDrawable {
+public class RectangleFigure extends Figure{
     private final int MAX_PARAMETERS_COUNT = 4;
+
+    public RectangleFigure() {}
+
+    public RectangleFigure(final double... params){
+        this.params = params;
+    }
+
     @Override
     public Node getDrawable(final double... params) throws IllegalArgumentException {
         if(params.length != MAX_PARAMETERS_COUNT) throw new IllegalArgumentException();

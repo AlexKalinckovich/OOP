@@ -4,7 +4,7 @@ import javafx.scene.control.Alert;
 
 public class MessageController {
 
-    public void showAlert(String title, String message) {
+    public static void showAlert(String title, String message) {
         /*
          * Alert - стандартное диалоговое окно
          * AlertType.ERROR - тип окна (иконка ошибки)

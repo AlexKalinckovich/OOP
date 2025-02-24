@@ -18,10 +18,11 @@ import org.example.oop.Models.Factories.UIFactory;
 import org.example.oop.Models.Files.FileManager;
 import org.example.oop.Models.PrintingClasses.MessageController;
 import org.example.oop.Models.Settings.FigureSettings;
-import org.example.oop.Models.ValidationClasses.ParametersValidator;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,8 +30,6 @@ import java.util.stream.Collectors;
 
 public class FigureView {
     private final Map<String, Figure> figureTypes;
-    private final MessageController messageController = new MessageController();
-    private final ParametersValidator parametersValidator = new ParametersValidator(messageController);
     private final FigureSettings settings = new FigureSettings();
     private final Stack<Node> drawingHistory = new Stack<>();
     private final ToggleGroup drawModeGroup = new ToggleGroup();
@@ -65,6 +64,10 @@ public class FigureView {
         setupRootLayout();
         initDrawStrategies();
         setupDrawModeSwitcher();
+    }
+
+    public void registerFigure(final String type,final Figure figure) {
+        figureTypes.put(type, figure);
     }
 
     private void setDefaultFigure() {
@@ -198,8 +201,6 @@ public class FigureView {
     private void initDrawStrategies() {
         currentDrawStrategy = StrategyFactory.createStrategy(
                 StrategyFactory.StrategyType.COORDINATE,
-                parametersValidator,
-                messageController,
                 parameterFields,
                 drawingArea,
                 drawingHistory
@@ -207,8 +208,6 @@ public class FigureView {
 
         coordRadio.setUserData(StrategyFactory.createStrategy(
                 StrategyFactory.StrategyType.COORDINATE,
-                parametersValidator,
-                messageController,
                 parameterFields,
                 drawingArea,
                 drawingHistory
@@ -216,8 +215,6 @@ public class FigureView {
 
         mouseRadio.setUserData(StrategyFactory.createStrategy(
                 StrategyFactory.StrategyType.MOUSE,
-                parametersValidator,
-                messageController,
                 parameterFields,
                 drawingArea,
                 drawingHistory
@@ -266,35 +263,36 @@ public class FigureView {
 
     private void handleSave() {
         final FileChooser fileChooser = new FileChooser();
+        Path projectDir = Paths.get(System.getProperty("user.dir"));
+        fileChooser.setInitialDirectory(projectDir.toFile());
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON", "*.json"));
         final File file = fileChooser.showSaveDialog(null);
+        final FileManager fileManager = new FileManager();
+        final List<Node> nodes = drawingArea.getChildren();
+
         if (file != null) {
-            executorService.submit(() -> {
-                try {
-                    FileManager.saveToFile(drawingHistory, file.toPath());
-                } catch (IOException e) {
-                    messageController.showAlert("File error","File not found");
-                }
-            });
+            try {
+                fileManager.saveToFile(nodes, file.toPath());
+            } catch (IOException e) {
+                Platform.runLater(() -> MessageController.showAlert("File error", "Failed to save file"));
+            }
         }
     }
 
     private void handleLoad() {
         final FileChooser fileChooser = new FileChooser();
+        Path projectDir = Paths.get(System.getProperty("user.dir"));
+        fileChooser.setInitialDirectory(projectDir.toFile());
         final File file = fileChooser.showOpenDialog(null);
+        final FileManager fileManager = new FileManager();
+
         if (file != null) {
-            executorService.submit(() -> {
-                List<Node> figures;
-                try {
-                    figures = FileManager.loadFromFile(file.toPath())
-                            .stream()
-                            .map((Figure::getDrawable))
-                            .toList();
-                    Platform.runLater(() -> drawingArea.getChildren().setAll(figures));
-                } catch (IOException e) {
-                    messageController.showAlert("File error","File not found");
-                }
-            });
+            try {
+                final List<Node> nodes = fileManager.loadFromFile(file.toPath());
+                drawingArea.getChildren().addAll(nodes);
+            } catch (IOException e) {
+                Platform.runLater(() -> MessageController.showAlert("File error", "Failed to load file"));
+            }
         }
     }
 

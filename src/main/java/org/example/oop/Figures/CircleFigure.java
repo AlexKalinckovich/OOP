@@ -7,8 +7,14 @@ import org.example.oop.FigureInterfaces.MouseDrawable;
 
 import java.util.List;
 
-public class CircleFigure extends Figure implements MouseDrawable {
+public class CircleFigure extends Figure {
     private final int CIRCLE_PARAMETERS_COUNT = 3;
+
+    public CircleFigure(final double... params) {
+        this.params = params;
+    }
+
+    public CircleFigure(){}
 
     @Override
     public Node getDrawable(final double... params) throws IllegalArgumentException {

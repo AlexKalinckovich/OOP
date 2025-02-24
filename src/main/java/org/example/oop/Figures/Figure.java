@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import javafx.scene.Node;
 import javafx.scene.shape.Shape;
-import org.example.oop.FigureInterfaces.Drawable;
 import org.example.oop.FigureInterfaces.MouseDrawable;
 import org.example.oop.Models.Settings.FigureSettings;
 
 import java.io.Serializable;
+
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = CircleFigure.class, name = "circle"),
@@ -18,7 +18,7 @@ import java.io.Serializable;
         @JsonSubTypes.Type(value = LineFigure.class, name = "line"),
         @JsonSubTypes.Type(value = PolylineFigure.class, name = "polyline")
 })
-public abstract class Figure extends Node implements Serializable {
+public abstract class Figure implements Serializable,MouseDrawable {
     private FigureSettings settings = new FigureSettings();
 
     protected double[] params = new double[0];
@@ -37,8 +37,10 @@ public abstract class Figure extends Node implements Serializable {
     public FigureSettings getSettings() { return settings; }
     public void setSettings(FigureSettings settings) { this.settings = settings; }
 
+
+
     public abstract Node getDrawable(double... params) throws IllegalArgumentException;
     public abstract int getParameterCount();
     public abstract String[] getParameterNames();
-    public double[] getParams() { return params; }
+    public double[] getParameters() { return params; }
 }

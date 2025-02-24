@@ -7,8 +7,14 @@ import org.example.oop.FigureInterfaces.MouseDrawable;
 
 import java.util.List;
 
-public class TriangleFigure extends Figure implements MouseDrawable {
+public class TriangleFigure extends Figure {
     private final int TRIANGLE_PARAMETERS_COUNT = 4;
+
+    public TriangleFigure() {}
+
+    public TriangleFigure(final double... params){
+        this.params = params;
+    }
 
     @Override
     public Node getDrawable(final double... params) throws IllegalArgumentException {

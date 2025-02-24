@@ -20,65 +20,55 @@ import java.util.Stack;
 
 public class MouseDrawStrategy implements DrawStrategy {
     private final Pane drawingArea;
-    private final MessageController messages;
-    private final ParametersValidator parametersValidator;
     private final List<Point2D> points = new ArrayList<>();
     private final List<Circle> tempDots = new ArrayList<>();
     private final Stack<Node> drawingHistory;
     private Node previewNode;
 
-    public MouseDrawStrategy(final ParametersValidator parametersValidator,
-                             final MessageController messages,
-                             final Pane drawingArea,
+    public MouseDrawStrategy(final Pane drawingArea,
                              final Stack<Node> drawingHistory) {
-        this.messages = messages;
         this.drawingArea = drawingArea;
-        this.parametersValidator = parametersValidator;
         this.drawingHistory = drawingHistory;
     }
 
     @Override
     public void draw(final Figure figure, final Bounds bounds) {
-        if (figure instanceof MouseDrawable mouseDrawable) {
-            setupHandlers(mouseDrawable,figure);
-        } else {
-            messages.showAlert("Error", "Figure does not support mouse drawing.");
-        }
+        setupHandlers(figure);
     }
 
-    private void setupHandlers(final MouseDrawable mouseDrawable,final Figure figure) {
+    private void setupHandlers(final Figure figure) {
         drawingArea.setOnMousePressed(null);
         drawingArea.setOnMouseDragged(null);
         drawingArea.setOnMouseReleased(null);
         drawingArea.setOnMouseClicked(null);
 
-        if (mouseDrawable.getInteractionType() == MouseDrawable.InteractionType.DRAG) {
-            setupDragHandlers(mouseDrawable,figure);
+        if (figure.getInteractionType() == MouseDrawable.InteractionType.DRAG) {
+            setupDragHandlers(figure);
         } else {
-            setupClickHandlers(mouseDrawable);
+            setupClickHandlers(figure);
         }
     }
 
-    private void setupDragHandlers(final MouseDrawable mouseDrawable,final Figure figure) {
+    private void setupDragHandlers(final Figure figure) {
         final Point2D[] startPoint = new Point2D[1];
 
         drawingArea.setOnMousePressed(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
                 // Валидация начальной точки
-                if (parametersValidator.isPointOutOfBounds(event.getX(), event.getY(), drawingArea.getLayoutBounds())) {
+                if (ParametersValidator.isPointOutOfBounds(event.getX(), event.getY(), drawingArea.getLayoutBounds())) {
                     return;
                 }
 
                 startPoint[0] = new Point2D(event.getX(), event.getY());
                 points.clear();
                 points.add(startPoint[0]);
-                updatePreview(mouseDrawable);
+                updatePreview(figure);
             }
         });
 
         drawingArea.setOnMouseDragged(event -> {
             if (startPoint[0] != null) {
-                if (parametersValidator.isPointOutOfBounds(event.getX(), event.getY(), drawingArea.getLayoutBounds())) {
+                if (ParametersValidator.isPointOutOfBounds(event.getX(), event.getY(), drawingArea.getLayoutBounds())) {
                     return;
                 }
 
@@ -89,7 +79,7 @@ public class MouseDrawStrategy implements DrawStrategy {
                 else {
                     points.add(current);
                 }
-                updatePreview(mouseDrawable);
+                updatePreview(figure);
             }
         });
 
@@ -98,14 +88,14 @@ public class MouseDrawStrategy implements DrawStrategy {
 
 
                 try {
-                    final Node node = mouseDrawable.createFromMousePoints(points);
-                    if (!parametersValidator.isFigureInBounds(points, drawingArea.getLayoutBounds(), figure)) {
+                    final Node node = figure.createFromMousePoints(points);
+                    if (!ParametersValidator.isFigureInBounds(points, drawingArea.getLayoutBounds(), figure)) {
                         return;
                     }
                     drawingArea.getChildren().add(node);
                     drawingHistory.push(node);
                 } catch (IllegalArgumentException e) {
-                    messages.showAlert("Error", e.getMessage());
+                    MessageController.showAlert("Error", e.getMessage());
                 }
                 clearPreview();
                 startPoint[0] = null;
@@ -119,7 +109,7 @@ public class MouseDrawStrategy implements DrawStrategy {
             if (event.getButton() == MouseButton.PRIMARY) {
 
                 boolean handleClickCondition = mouseDrawable.getInteractionType() == MouseDrawable.InteractionType.CLICKS &&
-                                               !parametersValidator.isPointOutOfBounds(
+                                               !ParametersValidator.isPointOutOfBounds(
                                                        event.getX(),
                                                        event.getY(),
                                                        drawingArea.getLayoutBounds());

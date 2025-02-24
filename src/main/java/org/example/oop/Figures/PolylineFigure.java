@@ -3,12 +3,18 @@ package org.example.oop.Figures;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.shape.Polyline;
-import org.example.oop.FigureInterfaces.MouseDrawable;
 
 import java.util.List;
 import java.util.stream.DoubleStream;
 
-public class PolylineFigure extends Figure implements MouseDrawable {
+public class PolylineFigure extends Figure{
+
+    public PolylineFigure(final double... params) {
+        this.params = params;
+    }
+
+    public PolylineFigure() {}
+
     @Override
     public Node getDrawable(final double... params) throws IllegalArgumentException {
         final Polyline polyline = new Polyline();

@@ -7,8 +7,14 @@ import org.example.oop.FigureInterfaces.MouseDrawable;
 
 import java.util.List;
 
-public class LineFigure extends Figure implements MouseDrawable {
+public class LineFigure extends Figure{
     private final int LINE_PARAMS_COUNT = 4;
+
+    public LineFigure() {}
+
+    public LineFigure(final double... params){
+        this.params = params;
+    }
 
     @Override
     public Node getDrawable(final double... params) throws IllegalArgumentException {
@@ -22,9 +28,7 @@ public class LineFigure extends Figure implements MouseDrawable {
         return line;
     }
 
-    public LineFigure(final double... params){
 
-    }
 
     @Override
     public int getParameterCount() { return LINE_PARAMS_COUNT; }
