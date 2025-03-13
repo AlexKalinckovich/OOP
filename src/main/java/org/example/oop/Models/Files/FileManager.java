@@ -18,7 +18,7 @@ public class FileManager {
             .enable(SerializationFeature.INDENT_OUTPUT);
     private final JSONConverter jsonConverter = new JSONConverter();
 
-    // Сохранение списка фигур в файл
+
     public void saveToFile(List<Node> nodes, Path path) throws IOException {
         final List<FigureDTO> dtos = nodes.stream()
                 .map(jsonConverter::nodeToDTO)
@@ -28,7 +28,7 @@ public class FileManager {
         mapper.writeValue(path.toFile(), dtos);
     }
 
-    // Загрузка списка фигур из файла
+
     public List<Node> loadFromFile(Path path) throws IOException {
         final List<FigureDTO> dtos = mapper.readValue(path.toFile(), new TypeReference<>() {});
         return dtos.stream()

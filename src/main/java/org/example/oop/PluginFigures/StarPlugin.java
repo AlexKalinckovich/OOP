@@ -13,7 +13,7 @@ import java.util.stream.DoubleStream;
 public class StarPlugin implements FigurePlugin {
     @Override
     public String getTypeName() {
-        return "star";
+        return "Star";
     }
 
     @Override

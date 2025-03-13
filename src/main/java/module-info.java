@@ -1,4 +1,5 @@
 module org.example.oop {
+    uses org.example.oop.Plugins.FigurePlugin;
     requires javafx.controls;
     requires javafx.fxml;
     requires org.controlsfx.controls;
@@ -20,6 +21,5 @@ module org.example.oop {
     opens org.example.oop.Plugins to javafx.fxml, com.fasterxml.jackson.databind;
     opens org.example.oop.PluginFigures to com.fasterxml.jackson.databind, javafx.fxml;
 
-    // Указываем, что модуль использует FigurePlugin
-    uses org.example.oop.Plugins.FigurePlugin;
+    provides org.example.oop.Plugins.FigurePlugin with org.example.oop.PluginFigures.StarPlugin;
 }

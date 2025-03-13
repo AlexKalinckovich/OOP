@@ -20,7 +20,7 @@ public class StarFigure extends Figure {
     }
 
     @Override
-    public int getParameterCount() {return 10;}
+    public int getParameterCount() {return 1;}
 
 
     @Override
@@ -63,26 +63,24 @@ public class StarFigure extends Figure {
     }
 
     @NotNull
-    private static List<Double> getDoubles(double outerRadius, double centerX, double centerY) {
-        double innerRadius = outerRadius * 0.5;
+    private static List<Double> getDoubles(final double outerRadius,
+                                           final double centerX,
+                                           final double centerY) {
+        final double innerRadius = outerRadius * 0.5;
 
-        // Количество лучей звезды
         final int spikes = 5;
 
-        // Список координат для вершин звезды
-        List<Double> starPoints = new ArrayList<>();
+        final List<Double> starPoints = new ArrayList<>();
 
-        // Угол между соседними вершинами
-        double angleStep = Math.PI / spikes;
+        final double angleStep = Math.PI / spikes;
 
-        // Рассчитываем координаты вершин
-        for (int i = 0; i < spikes * 2; i++) {
-            double radius = (i % 2 == 0) ? outerRadius : innerRadius; // Чередуем внешний и внутренний радиус
-            double angle = i * angleStep;
+        final int size = spikes * 2 + 1;
+        for (int i = 0; i < size; i++) {
+            final double radius = (i % 2 == 0) ? outerRadius : innerRadius; // Чередуем внешний и внутренний радиус
+            final double angle = i * angleStep;
 
-            // Координаты вершины
-            double x = centerX + radius * Math.cos(angle);
-            double y = centerY + radius * Math.sin(angle);
+            final double x = centerX + radius * Math.cos(angle);
+            final double y = centerY + radius * Math.sin(angle);
 
             starPoints.add(x);
             starPoints.add(y);

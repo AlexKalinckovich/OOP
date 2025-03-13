@@ -68,6 +68,7 @@ public class FigureView {
 
     public void registerFigure(final String type,final Figure figure) {
         figureTypes.put(type, figure);
+        figureSelector.getItems().add(type);
     }
 
     private void setDefaultFigure() {
