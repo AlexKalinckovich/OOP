@@ -23,12 +23,15 @@ public class MouseDrawStrategy implements DrawStrategy {
     private final List<Point2D> points = new ArrayList<>();
     private final List<Circle> tempDots = new ArrayList<>();
     private final Stack<Node> drawingHistory;
+    private final Stack<Node> redoHistory;
     private Node previewNode;
 
     public MouseDrawStrategy(final Pane drawingArea,
-                             final Stack<Node> drawingHistory) {
+                             final Stack<Node> drawingHistory,
+                             final Stack<Node> redoHistory) {
         this.drawingArea = drawingArea;
         this.drawingHistory = drawingHistory;
+        this.redoHistory = redoHistory;
     }
 
     @Override
@@ -94,6 +97,7 @@ public class MouseDrawStrategy implements DrawStrategy {
                     }
                     drawingArea.getChildren().add(node);
                     drawingHistory.push(node);
+                    redoHistory.clear();
                 } catch (IllegalArgumentException e) {
                     MessageController.showAlert("Error", e.getMessage());
                 }

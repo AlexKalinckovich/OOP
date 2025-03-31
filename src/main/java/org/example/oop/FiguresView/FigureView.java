@@ -32,6 +32,7 @@ public class FigureView {
     private final Map<String, Figure> figureTypes;
     private final FigureSettings settings = new FigureSettings();
     private final Stack<Node> drawingHistory = new Stack<>();
+    private final Stack<Node> redoHistory = new Stack<>();
     private final ToggleGroup drawModeGroup = new ToggleGroup();
     private final RadioButton coordRadio = new RadioButton("By Coordinates");
     private final RadioButton mouseRadio = new RadioButton("By Mouse");
@@ -66,6 +67,7 @@ public class FigureView {
         setupDrawModeSwitcher();
     }
 
+
     public void registerFigure(final String type,final Figure figure) {
         figureTypes.put(type, figure);
         figureSelector.getItems().add(type);
@@ -86,7 +88,6 @@ public class FigureView {
             throw new IllegalStateException();
         }
 
-        // Надо автоматически поменять стратегию, не дожидаясь нажатия на кнопку "Draw"
         if(mouseRadio.isSelected()) {
             drawFigure();
         }
@@ -139,13 +140,25 @@ public class FigureView {
         final Button undoButton = UIFactory.createIconButton("undo.png", "Отменить");
         undoButton.setOnAction(_ -> handleUndo());
 
-        toolBar.getItems().addAll(saveButton, loadButton, undoButton);
+        final Button redoButton = UIFactory.createIconButton("redo.png", "Отменить");
+        redoButton.setOnAction(_ -> handleRedo());
+
+        toolBar.getItems().addAll(saveButton, loadButton, undoButton, redoButton);
         rootLayout.setTop(toolBar);
+    }
+
+    private void handleRedo(){
+        if(!redoHistory.empty()){
+            final Node lastFigure = redoHistory.pop();
+            drawingHistory.push(lastFigure);
+            drawingArea.getChildren().add(lastFigure);
+        }
     }
 
     private void handleUndo() {
         if (!drawingHistory.isEmpty()) {
             final Node lastFigure = drawingHistory.pop();
+            redoHistory.push(lastFigure);
             drawingArea.getChildren().removeIf(node -> node == lastFigure);
         }
     }
@@ -204,21 +217,24 @@ public class FigureView {
                 StrategyFactory.StrategyType.COORDINATE,
                 parameterFields,
                 drawingArea,
-                drawingHistory
+                drawingHistory,
+                redoHistory
         );
 
         coordRadio.setUserData(StrategyFactory.createStrategy(
                 StrategyFactory.StrategyType.COORDINATE,
                 parameterFields,
                 drawingArea,
-                drawingHistory
+                drawingHistory,
+                redoHistory
         ));
 
         mouseRadio.setUserData(StrategyFactory.createStrategy(
                 StrategyFactory.StrategyType.MOUSE,
                 parameterFields,
                 drawingArea,
-                drawingHistory
+                drawingHistory,
+                redoHistory
         ));
     }
 

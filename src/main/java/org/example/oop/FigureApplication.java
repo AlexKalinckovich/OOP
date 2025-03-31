@@ -5,7 +5,6 @@ import javafx.stage.Stage;
 import org.example.oop.Figures.*;
 import org.example.oop.FiguresView.FigureView;
 import org.example.oop.Models.Files.FileManager;
-import org.example.oop.PluginFigures.StarPlugin;
 import org.example.oop.Plugins.FigurePlugin;
 
 import java.util.List;

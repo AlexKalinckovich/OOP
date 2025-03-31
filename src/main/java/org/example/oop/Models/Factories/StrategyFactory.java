@@ -15,11 +15,12 @@ public class StrategyFactory {
             final StrategyType type,
             final TextField[] fields,
             final Pane drawingArea,
-            final Stack<Node> drawingHistory
+            final Stack<Node> drawingHistory,
+            final Stack<Node> redoHistory
     ) {
         return switch (type) {
             case StrategyType.COORDINATE -> new CoordinateDrawStrategy(fields, drawingArea);
-            case StrategyType.MOUSE -> new MouseDrawStrategy(drawingArea,drawingHistory);
+            case StrategyType.MOUSE -> new MouseDrawStrategy(drawingArea,drawingHistory,redoHistory);
         };
     }
 
