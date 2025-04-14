@@ -5,4 +5,6 @@ import org.example.oop.Figures.Figure;
 
 public interface DrawStrategy {
     void draw(Figure figure, Bounds drawingAreaBounds);
+    void undo();
+    void redo();
 }

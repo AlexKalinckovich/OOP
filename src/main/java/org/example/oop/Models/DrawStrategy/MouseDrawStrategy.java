@@ -22,16 +22,12 @@ public class MouseDrawStrategy implements DrawStrategy {
     private final Pane drawingArea;
     private final List<Point2D> points = new ArrayList<>();
     private final List<Circle> tempDots = new ArrayList<>();
-    private final Stack<Node> drawingHistory;
-    private final Stack<Node> redoHistory;
+    private final Stack<Node> drawingHistory = new Stack<>();
+    private final Stack<Node> redoHistory = new Stack<>();
     private Node previewNode;
 
-    public MouseDrawStrategy(final Pane drawingArea,
-                             final Stack<Node> drawingHistory,
-                             final Stack<Node> redoHistory) {
+    public MouseDrawStrategy(final Pane drawingArea) {
         this.drawingArea = drawingArea;
-        this.drawingHistory = drawingHistory;
-        this.redoHistory = redoHistory;
     }
 
     @Override
@@ -141,11 +137,14 @@ public class MouseDrawStrategy implements DrawStrategy {
             try {
                 final Node node = mouseDrawable.createFromMousePoints(points);
                 drawingArea.getChildren().add(node);
+                drawingHistory.push(node);
+                redoHistory.clear();
             } catch (IllegalArgumentException _) {}
             tempDots.forEach(dot -> drawingArea.getChildren().remove(dot));
             tempDots.clear();
             clearPreview();
             points.clear();
+
         }
     }
 
@@ -176,6 +175,24 @@ public class MouseDrawStrategy implements DrawStrategy {
         if (previewNode != null) {
             drawingArea.getChildren().remove(previewNode);
             previewNode = null;
+        }
+    }
+
+    @Override
+    public void undo() {
+        if (!drawingHistory.empty()) {
+            Node last = drawingHistory.pop();
+            redoHistory.push(last);
+            drawingArea.getChildren().remove(last);
+        }
+    }
+
+    @Override
+    public void redo() {
+        if (!redoHistory.empty()) {
+            Node node = redoHistory.pop();
+            drawingHistory.push(node);
+            drawingArea.getChildren().add(node);
         }
     }
 }

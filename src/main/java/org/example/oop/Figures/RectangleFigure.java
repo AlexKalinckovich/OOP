@@ -4,7 +4,6 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
-import org.example.oop.FigureInterfaces.MouseDrawable;
 
 import java.util.List;
 
@@ -12,10 +11,6 @@ public class RectangleFigure extends Figure{
     private final int MAX_PARAMETERS_COUNT = 4;
 
     public RectangleFigure() {}
-
-    public RectangleFigure(final double... params){
-        this.params = params;
-    }
 
     @Override
     public Node getDrawable(final double... params) throws IllegalArgumentException {

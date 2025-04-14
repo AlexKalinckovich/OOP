@@ -3,7 +3,6 @@ package org.example.oop.Figures;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.shape.Ellipse;
-import org.example.oop.FigureInterfaces.MouseDrawable;
 
 import java.util.List;
 
@@ -11,10 +10,6 @@ public class EllipseFigure extends Figure {
     private final int MAX_ELLIPSE_COUNT = 4;
 
     public EllipseFigure() {}
-
-    public EllipseFigure(final double... params){
-        this.params = params;
-    }
 
     @Override
     public Node getDrawable(final double... params) throws IllegalArgumentException {

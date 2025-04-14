@@ -3,7 +3,7 @@ package org.example.oop;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import org.example.oop.Figures.*;
-import org.example.oop.FiguresView.FigureView;
+import org.example.oop.FiguresView.Controllers.FigureController;
 import org.example.oop.Models.Files.FileManager;
 import org.example.oop.Plugins.FigurePlugin;
 
@@ -24,16 +24,15 @@ public class FigureApplication extends Application {
                 new PolygonFigure()
         );
 
-        // Создаем View и настраиваем Stage
-        final FigureView figureView = new FigureView(figures);
+        final FigureController figureController = new FigureController(figures);
         stage.setTitle("Figure Drawing Application");
-        stage.setScene(figureView.getScene());
+        stage.setScene(figureController.getScene());
 
         final FileManager fileManager = new FileManager();
         final ServiceLoader<FigurePlugin> plugins = ServiceLoader.load(FigurePlugin.class);
         plugins.forEach(plugin -> {
             System.out.println("Loaded plugin: " + plugin.getTypeName());
-            figureView.registerFigure(plugin.getTypeName(), plugin.createFigureInstance());
+            figureController.registerFigure(plugin.getTypeName(), plugin.createFigureInstance());
             fileManager.registerPlugin(plugin);
             fileManager.registerSubtypes(plugin.getFigureClass());
         });

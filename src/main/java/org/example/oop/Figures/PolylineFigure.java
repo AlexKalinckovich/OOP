@@ -9,10 +9,6 @@ import java.util.stream.DoubleStream;
 
 public class PolylineFigure extends Figure{
 
-    public PolylineFigure(final double... params) {
-        this.params = params;
-    }
-
     public PolylineFigure() {}
 
     @Override
