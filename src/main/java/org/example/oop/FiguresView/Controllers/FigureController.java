@@ -10,6 +10,7 @@ import org.example.oop.FiguresView.Panels.SettingsPanel;
 import org.example.oop.FiguresView.Panels.ToolbarPanel;
 import org.example.oop.Models.DrawStrategy.DrawStrategy;
 import org.example.oop.Models.DrawStrategy.MouseDrawStrategy;
+import org.example.oop.Models.Settings.FigureSettings;
 
 import java.util.Collection;
 import java.util.Map;
@@ -101,7 +102,8 @@ public class FigureController {
      */
     private void drawFigure() {
         if (currentFigure != null) {
-            currentFigure.setSettings(settingsPanel.getSettings());
+            FigureSettings settings = settingsPanel.getSettings();
+            currentFigure.setSettings(settings);
 
             currentDrawStrategy.draw(currentFigure, drawingArea.getDrawingPane().getLayoutBounds());
         }

@@ -46,7 +46,9 @@ public class RectangleFigure extends Figure{
         final double y = Math.min(points.getFirst().getY(), points.get(1).getY());
         final double width = Math.abs(points.getFirst().getX() - points.get(1).getX());
         final double height = Math.abs(points.getFirst().getY() - points.get(1).getY());
-        return new Rectangle(x, y, width, height);
+        final Rectangle rectangle = new Rectangle(x, y, width, height);
+        applyStyle(rectangle);
+        return rectangle;
     }
 
     @Override

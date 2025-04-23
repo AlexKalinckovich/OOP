@@ -5,10 +5,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import org.example.oop.Plugins.FigurePlugin;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.DoubleStream;
 
@@ -20,7 +17,7 @@ public class JSONConverter {
                     "Line",this::convertLineToDTO,
                     "Polyline",this::convertPolylineToDTO,
                     "Rectangle",this::convertRectangleToDTO,
-                    "Triangle",this::convertTriangleToDTO
+                    "Polygon",this::convertTriangleToDTO
             )
     );
 
@@ -32,7 +29,7 @@ public class JSONConverter {
                     "Line",this::convertDTOToLine,
                     "Polyline",this::convertDTOToPolygon,
                     "Rectangle",this::convertDTOToRectangle,
-                    "Triangle",this::convertDTOToPolygon
+                    "Polygon",this::convertDTOToPolygon
             )
     );
 
@@ -115,18 +112,29 @@ public class JSONConverter {
 
     private FigureDTO convertTriangleToDTO(Node node) {
         final Polygon triangle = (Polygon) node;
-        final double[] points = triangle.getPoints()
-                .stream()
-                .flatMapToDouble(DoubleStream::of).toArray();
+
+        List<Double> originalPoints = triangle.getPoints();
+
+        List<Double> closedPoints = new ArrayList<>(originalPoints);
+        if (originalPoints.size() >= 2) {
+            closedPoints.add(originalPoints.get(0)); // x₀
+            closedPoints.add(originalPoints.get(1)); // y₀
+        }
+
+        double[] pointsArray = closedPoints.stream()
+                .mapToDouble(Double::doubleValue)
+                .toArray();
+
         return new FigureDTO(
-                   "Triangle",
-                        points,
-                        triangle.getFill().toString(),
-                        triangle.getStroke().toString(),
-                        triangle.getStrokeWidth(),
-                        triangle.getStrokeDashArray()
+                "Polygon",
+                pointsArray,
+                triangle.getFill().toString(),
+                triangle.getStroke().toString(),
+                triangle.getStrokeWidth(),
+                triangle.getStrokeDashArray()
         );
     }
+
 
     // Методы для преобразования DTO в Node
     private Node convertDTOToCircle(FigureDTO dto) {
