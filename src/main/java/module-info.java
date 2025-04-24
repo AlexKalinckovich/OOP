@@ -2,11 +2,7 @@ module org.example.oop {
     uses org.example.oop.Plugins.FigurePlugin;
     requires javafx.controls;
     requires javafx.fxml;
-    requires org.controlsfx.controls;
-    requires com.dlsc.formsfx;
-    requires com.almasb.fxgl.all;
     requires com.fasterxml.jackson.databind;
-    requires annotations;
     requires jdk.compiler;
 
     // Экспортируем пакеты
@@ -14,6 +10,7 @@ module org.example.oop {
     exports org.example.oop.Models.Files;
     exports org.example.oop.Plugins;
     exports org.example.oop.PluginFigures;
+    exports org.example.oop.FigureInterfaces;
 
     // Открываем пакеты для Jackson и JavaFX
     opens org.example.oop to javafx.fxml, com.fasterxml.jackson.databind;

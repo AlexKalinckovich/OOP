@@ -7,12 +7,12 @@ import javafx.scene.shape.Line;
 import java.util.List;
 
 public class LineFigure extends Figure{
-    private final int LINE_PARAMS_COUNT = 4;
 
     public LineFigure() {}
 
     @Override
     public Node getDrawable(final double... params) throws IllegalArgumentException {
+        final int LINE_PARAMS_COUNT = 4;
         if(params.length != LINE_PARAMS_COUNT) throw new IllegalArgumentException();
         final Line line = new Line();
         applyStyle(line);
@@ -23,15 +23,6 @@ public class LineFigure extends Figure{
         return line;
     }
 
-
-
-    @Override
-    public int getParameterCount() { return LINE_PARAMS_COUNT; }
-
-    @Override
-    public String[] getParameterNames() {
-        return new String[]{"Start X", "Start Y", "End X", "End Y"};
-    }
 
     @Override
     public InteractionType getInteractionType() {

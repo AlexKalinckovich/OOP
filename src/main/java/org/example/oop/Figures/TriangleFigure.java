@@ -7,12 +7,12 @@ import javafx.scene.shape.Polygon;
 import java.util.List;
 
 public class TriangleFigure extends Figure {
-    private final int TRIANGLE_PARAMETERS_COUNT = 4;
 
     public TriangleFigure() {}
 
     @Override
     public Node getDrawable(final double... params) throws IllegalArgumentException {
+        final int TRIANGLE_PARAMETERS_COUNT = 4;
         if (params.length != TRIANGLE_PARAMETERS_COUNT) {
             throw new IllegalArgumentException("Triangle requires 4 parameters: centerX, centerY, width, height");
         }
@@ -29,14 +29,6 @@ public class TriangleFigure extends Figure {
         );
         applyStyle(triangle);
         return triangle;
-    }
-
-    @Override
-    public int getParameterCount() { return TRIANGLE_PARAMETERS_COUNT; }
-
-    @Override
-    public String[] getParameterNames() {
-        return new String[]{"X1", "Y1", "X2", "Y2", "X3", "Y3"};
     }
 
     @Override

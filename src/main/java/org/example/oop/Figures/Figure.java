@@ -33,14 +33,6 @@ public abstract class Figure implements Serializable,MouseDrawable {
             }
         }
     }
-
-    public FigureSettings getSettings() { return settings; }
     public void setSettings(FigureSettings settings) { this.settings = settings; }
-
-
-
     public abstract Node getDrawable(double... params) throws IllegalArgumentException;
-    public abstract int getParameterCount();
-    public abstract String[] getParameterNames();
-    public double[] getParameters() { return params; }
 }

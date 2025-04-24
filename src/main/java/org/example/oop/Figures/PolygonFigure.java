@@ -26,16 +26,6 @@ public class PolygonFigure extends Figure {
     }
 
     @Override
-    public int getParameterCount() {
-        return 1;
-    }
-
-    @Override
-    public String[] getParameterNames() {
-        return new String[]{"Points (x1 y1 x2 y2...)"};
-    }
-
-    @Override
     public InteractionType getInteractionType() {
         return InteractionType.CLICKS;
     }

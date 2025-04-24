@@ -7,12 +7,12 @@ import javafx.scene.shape.Circle;
 import java.util.List;
 
 public class CircleFigure extends Figure {
-    private final int CIRCLE_PARAMETERS_COUNT = 3;
 
     public CircleFigure(){}
 
     @Override
     public Node getDrawable(final double... params) throws IllegalArgumentException {
+        final int CIRCLE_PARAMETERS_COUNT = 3;
         if(params.length != CIRCLE_PARAMETERS_COUNT) throw new IllegalArgumentException();
         this.params = params;
         final Circle circle = new Circle();
@@ -21,14 +21,6 @@ public class CircleFigure extends Figure {
         circle.setCenterY(params[1]);
         circle.setRadius(params[2]);
         return circle;
-    }
-
-    @Override
-    public int getParameterCount() { return CIRCLE_PARAMETERS_COUNT; }
-
-    @Override
-    public String[] getParameterNames() {
-        return new String[]{"Center X", "Center Y", "Radius"};
     }
 
     @Override

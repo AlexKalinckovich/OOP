@@ -7,12 +7,12 @@ import javafx.scene.shape.Ellipse;
 import java.util.List;
 
 public class EllipseFigure extends Figure {
-    private final int MAX_ELLIPSE_COUNT = 4;
 
     public EllipseFigure() {}
 
     @Override
     public Node getDrawable(final double... params) throws IllegalArgumentException {
+        final int MAX_ELLIPSE_COUNT = 4;
         if(params.length != MAX_ELLIPSE_COUNT) throw new IllegalArgumentException();
         this.params = params;
         final Ellipse ellipse = new Ellipse();
@@ -22,14 +22,6 @@ public class EllipseFigure extends Figure {
         ellipse.setRadiusX(params[2]);
         ellipse.setRadiusY(params[3]);
         return ellipse;
-    }
-
-    @Override
-    public int getParameterCount() { return MAX_ELLIPSE_COUNT; }
-
-    @Override
-    public String[] getParameterNames() {
-        return new String[]{"Center X", "Center Y", "Radius X", "Radius Y"};
     }
 
     @Override

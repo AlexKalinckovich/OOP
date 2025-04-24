@@ -8,12 +8,12 @@ import javafx.scene.shape.Rectangle;
 import java.util.List;
 
 public class RectangleFigure extends Figure{
-    private final int MAX_PARAMETERS_COUNT = 4;
 
     public RectangleFigure() {}
 
     @Override
     public Node getDrawable(final double... params) throws IllegalArgumentException {
+        final int MAX_PARAMETERS_COUNT = 4;
         if(params.length != MAX_PARAMETERS_COUNT) throw new IllegalArgumentException();
         final Polygon polygon = new Polygon();
         polygon.getPoints().setAll(
@@ -24,14 +24,6 @@ public class RectangleFigure extends Figure{
         );
         applyStyle(polygon);
         return polygon;
-    }
-
-    @Override
-    public int getParameterCount() { return MAX_PARAMETERS_COUNT; }
-
-    @Override
-    public String[] getParameterNames() {
-        return new String[]{"Left", "Top", "Right", "Bottom"};
     }
 
     @Override
