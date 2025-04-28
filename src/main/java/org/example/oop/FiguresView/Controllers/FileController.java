@@ -9,11 +9,18 @@ import org.example.oop.Models.PrintingClasses.MessageController;
 import javafx.application.Platform;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
+import java.util.ServiceLoader;
 
 import javafx.scene.Node;
+import org.example.oop.Plugins.FigurePlugin;
+import org.example.oop.Plugins.PluginConfigRegistry;
 
 public class FileController {
 
@@ -51,4 +58,45 @@ public class FileController {
             }
         }
     }
+
+    public static Optional<FigurePlugin> handleJarPluginLoad() {
+        final FileChooser chooser = new FileChooser();
+        chooser.setTitle("Выберите JAR-файл плагина");
+        chooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Java Archive", "*.jar")
+        );
+        final File jarFile = chooser.showOpenDialog(null);
+        if (jarFile == null) {
+            return Optional.empty();
+        }
+
+        try {
+            final URL jarUrl = jarFile.toURI().toURL();
+            final URLClassLoader loader = new URLClassLoader(
+                    new URL[]{jarUrl},
+                    FigurePlugin.class.getClassLoader()
+            );
+
+            final ServiceLoader<FigurePlugin> sl = ServiceLoader.load(FigurePlugin.class, loader);
+            final Iterator<FigurePlugin> it = sl.iterator();
+            if (!it.hasNext()) {
+                MessageController.showAlert("Error","В выбранном JAR нет реализации FigurePlugin.");
+                return Optional.empty();
+            }
+
+            final FigurePlugin plugin = it.next();
+            if (plugin.getTypeName() == null || plugin.getTypeName().isBlank()) {
+                MessageController.showAlert("Error","Неверный плагин: отсутствует имя фигуры.");
+                return Optional.empty();
+            }
+
+            PluginConfigRegistry.addPlugin(plugin.getTypeName(),jarFile.getAbsolutePath());
+
+            return Optional.of(plugin);
+        } catch (IOException e) {
+            MessageController.showAlert("Error","Ошибка при загрузке JAR: " + e.getMessage());
+            return Optional.empty();
+        }
+    }
+
 }

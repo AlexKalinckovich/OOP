@@ -10,10 +10,13 @@ import org.example.oop.FiguresView.Panels.SettingsPanel;
 import org.example.oop.FiguresView.Panels.ToolbarPanel;
 import org.example.oop.Models.DrawStrategy.DrawStrategy;
 import org.example.oop.Models.DrawStrategy.MouseDrawStrategy;
+import org.example.oop.Models.Files.FileManager;
 import org.example.oop.Models.Settings.FigureSettings;
+import org.example.oop.Plugins.FigurePlugin;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class FigureController {
@@ -47,7 +50,7 @@ public class FigureController {
     }
 
     public void registerFigure(final String type,final Figure figure) {
-        figureTypes.put(type, figure);
+        figureTypes.put(type + "Figure", figure);
         controlPanel.addNewFigure(figure);
     }
 
@@ -75,10 +78,23 @@ public class FigureController {
         toolbarPanel.setOnUndoAction((_) -> currentDrawStrategy.undo());
         toolbarPanel.setOnRedoAction((_) -> currentDrawStrategy.redo());
 
+        toolbarPanel.setOnPluginAction((_) -> pluginLoad());
+
         // Обработчики сохранения/загрузки
         toolbarPanel.setOnSaveAction((_) -> FileController.handleSave(drawingArea.getCurrentNodes()));
         toolbarPanel.setOnLoadAction((_) -> FileController.handleLoad(drawingArea.getDrawingPane()));
 
+    }
+
+    private void pluginLoad(){
+        Optional<FigurePlugin> pluginOptional = FileController.handleJarPluginLoad();
+        if(pluginOptional.isPresent()){
+            final FigurePlugin plugin = pluginOptional.get();
+            System.out.println("Loaded plugin: " + plugin.getTypeName());
+            registerFigure(plugin.getTypeName(), plugin.createFigureInstance());
+            FileManager.registerPlugin(plugin);
+            FileManager.registerSubtypes(plugin.getFigureClass());
+        }
     }
 
     /**

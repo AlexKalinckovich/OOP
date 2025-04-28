@@ -16,7 +16,7 @@ import java.util.Optional;
 public class FileManager {
     private static final ObjectMapper mapper = new ObjectMapper()
             .enable(SerializationFeature.INDENT_OUTPUT);
-    private final JSONConverter jsonConverter = new JSONConverter();
+    private static final JSONConverter jsonConverter = new JSONConverter();
 
 
     public void saveToFile(List<Node> nodes, Path path) throws IOException {
@@ -38,11 +38,11 @@ public class FileManager {
                 .toList();
     }
 
-    public void registerPlugin(final FigurePlugin plugin){
+    public static void registerPlugin(final FigurePlugin plugin){
         jsonConverter.registerPlugin(plugin);
     }
 
-    public void registerSubtypes(final Class<? extends Figure> subtype){
+    public static void registerSubtypes(final Class<? extends Figure> subtype){
         mapper.registerModule(new SimpleModule(){
             @Override
             public void setupModule(SetupContext context) {

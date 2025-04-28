@@ -13,6 +13,7 @@ public class ToolbarPanel {
     private Consumer<Void> onRedoAction;
     private Consumer<Void> onSaveAction;
     private Consumer<Void> onLoadAction;
+    private Consumer<Void> onPluginAction;
 
     public ToolbarPanel() {
         toolBar = new ToolBar();
@@ -21,13 +22,15 @@ public class ToolbarPanel {
         final Button loadButton = UIControlsFactory.createIconButton("load.png", "Загрузить");
         final Button undoButton = UIControlsFactory.createIconButton("undo.png", "Отменить");
         final Button redoButton = UIControlsFactory.createIconButton("redo.png", "Повторить");
+        final Button pluginButton = UIControlsFactory.createIconButton("plugin.png","Загрузить плагин");
 
         saveButton.setOnAction(_ -> { if(onSaveAction != null) onSaveAction.accept(null); });
         loadButton.setOnAction(_ -> { if(onLoadAction != null) onLoadAction.accept(null); });
         undoButton.setOnAction(_ -> { if(onUndoAction != null) onUndoAction.accept(null); });
         redoButton.setOnAction(_ -> { if(onRedoAction != null) onRedoAction.accept(null); });
+        pluginButton.setOnAction(_ -> { if(onPluginAction != null) onPluginAction.accept(null); });
 
-        toolBar.getItems().addAll(saveButton, loadButton, undoButton, redoButton);
+        toolBar.getItems().addAll(saveButton, loadButton, undoButton, redoButton,pluginButton);
     }
 
 
@@ -50,4 +53,6 @@ public class ToolbarPanel {
     public void setOnLoadAction(Consumer<Void> handler) {
         this.onLoadAction = handler;
     }
+
+    public void setOnPluginAction(Consumer<Void> handler) {this.onPluginAction = handler;}
 }

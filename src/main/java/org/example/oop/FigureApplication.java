@@ -6,8 +6,10 @@ import org.example.oop.Figures.*;
 import org.example.oop.FiguresView.Controllers.FigureController;
 import org.example.oop.Models.Files.FileManager;
 import org.example.oop.Plugins.FigurePlugin;
+import org.example.oop.Plugins.PluginConfigRegistry;
 
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 public class FigureApplication extends Application {
@@ -27,15 +29,7 @@ public class FigureApplication extends Application {
         final FigureController figureController = new FigureController(figures);
         stage.setTitle("Figure Drawing Application");
         stage.setScene(figureController.getScene());
-
-        final FileManager fileManager = new FileManager();
-        final ServiceLoader<FigurePlugin> plugins = ServiceLoader.load(FigurePlugin.class);
-        plugins.forEach(plugin -> {
-            System.out.println("Loaded plugin: " + plugin.getTypeName());
-            figureController.registerFigure(plugin.getTypeName(), plugin.createFigureInstance());
-            fileManager.registerPlugin(plugin);
-            fileManager.registerSubtypes(plugin.getFigureClass());
-        });
+        PluginConfigRegistry.initializePlugins(figureController);
         stage.show();
     }
 
