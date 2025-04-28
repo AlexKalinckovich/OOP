@@ -97,7 +97,6 @@ public class PluginConfigRegistry {
             }
         }
 
-        // Сохраняем очищенный список
         savePlugins(plugins);
     }
 

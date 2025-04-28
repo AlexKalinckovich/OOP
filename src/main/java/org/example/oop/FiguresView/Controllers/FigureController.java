@@ -20,7 +20,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class FigureController {
-    // Мапа фигур для выбора (Model)
+    // Мапа фигур для выбора
     private final Map<String, Figure> figureTypes;
     private Figure currentFigure;
 
@@ -34,11 +34,9 @@ public class FigureController {
     private DrawStrategy currentDrawStrategy;
 
     public FigureController(Collection<Figure> figures) {
-        // Инициализируем фигуры
         this.figureTypes = figures.stream()
                 .collect(Collectors.toMap(f -> f.getClass().getSimpleName(), f -> f));
 
-        // Создаём фасады UI-компонентов (Facade)
         drawingArea = new DrawingArea();
         controlPanel = new ControlPanel(figureTypes.keySet());
         toolbarPanel = new ToolbarPanel();

@@ -2,65 +2,15 @@ package org.example.oop.Models.ValidationClasses;
 
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
 import org.example.oop.Figures.CircleFigure;
 import org.example.oop.Figures.Figure;
 import org.example.oop.Figures.TriangleFigure;
-import org.example.oop.Models.PrintingClasses.MessageController;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 public class ParametersValidator {
 
     public ParametersValidator() {
-    }
-
-    private static List<String> getFieldsParams(final TextField[] parameterFields) throws NullPointerException {
-        return  Arrays.stream(parameterFields)
-                .map(TextInputControl::getText)
-                .map(String::trim)
-                .flatMap(text -> Arrays.stream(text.split("\\s+")))
-                .filter(s -> !s.isEmpty())
-                .toList();
-    }
-
-    public static Optional<double[]> parseParameters(final TextField[] parameterFields){
-        Optional<double[]> result = Optional.empty();
-        try {
-            final List<String> params = getFieldsParams(parameterFields);
-            result = Optional.ofNullable(params.stream()
-                    .mapToDouble(Double::parseDouble)
-                    .toArray());
-
-        }catch (NumberFormatException _){
-            MessageController.showAlert("Invalid enters","Values must be numeric");
-        }catch (NullPointerException _) {
-            MessageController.showAlert("Invalid figure",
-                    "Choose one of the figures");
-        }
-        return result;
-    }
-
-    public static boolean isCorrectCoordinates(final double[] params, final Bounds bounds) {
-
-        if(params == null || params.length == 0) return false;
-
-        final int size = params.length;
-        for (int i = 0; i < size; i++) {
-            final double val = params[i];
-            if (i % 2 == 0 && (val < 0 || val > bounds.getWidth())) {
-                MessageController.showAlert("Ошибка", "X координата выходит за пределы");
-                return false;
-            }
-            if (i % 2 == 1 && (val < 0 || val > bounds.getHeight())) {
-                MessageController.showAlert("Ошибка", "X координата выходит за пределы");
-                return false;
-            }
-        }
-        return true;
     }
 
     public static boolean isPointOutOfBounds(double x, double y, final Bounds bounds) {

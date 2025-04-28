@@ -26,7 +26,7 @@ public class FileController {
 
     public static void handleSave(List<Node> nodes) {
         final FileChooser fileChooser = new FileChooser();
-        Path projectDir = Paths.get(System.getProperty("user.dir"));
+        final Path projectDir = Paths.get(System.getProperty("user.dir"));
         fileChooser.setInitialDirectory(projectDir.toFile());
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON", "*.json"));
         final File file = fileChooser.showSaveDialog(null);
@@ -43,7 +43,7 @@ public class FileController {
 
     public static void handleLoad(Pane drawingArea) {
         final FileChooser fileChooser = new FileChooser();
-        Path projectDir = Paths.get(System.getProperty("user.dir"));
+        final Path projectDir = Paths.get(System.getProperty("user.dir"));
         fileChooser.setInitialDirectory(projectDir.toFile());
         final File file = fileChooser.showOpenDialog(null);
         final FileManager fileManager = new FileManager();
@@ -51,7 +51,7 @@ public class FileController {
 
         if (file != null) {
             try {
-                List<Node> result = fileManager.loadFromFile(file.toPath());
+                final List<Node> result = fileManager.loadFromFile(file.toPath());
                 drawingArea.getChildren().addAll(result);
             } catch (IOException e) {
                 Platform.runLater(() -> MessageController.showAlert("File error", "Failed to load file"));

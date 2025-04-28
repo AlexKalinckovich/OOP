@@ -38,21 +38,21 @@ public class ToolbarPanel {
         return toolBar;
     }
 
-    public void setOnUndoAction(Consumer<Void> handler) {
+    public void setOnUndoAction(final Consumer<Void> handler) {
         this.onUndoAction = handler;
     }
 
-    public void setOnRedoAction(Consumer<Void> handler) {
+    public void setOnRedoAction(final Consumer<Void> handler) {
         this.onRedoAction = handler;
     }
 
-    public void setOnSaveAction(Consumer<Void> handler) {
+    public void setOnSaveAction(final Consumer<Void> handler) {
         this.onSaveAction = handler;
     }
 
-    public void setOnLoadAction(Consumer<Void> handler) {
+    public void setOnLoadAction(final Consumer<Void> handler) {
         this.onLoadAction = handler;
     }
 
-    public void setOnPluginAction(Consumer<Void> handler) {this.onPluginAction = handler;}
+    public void setOnPluginAction(final Consumer<Void> handler) {this.onPluginAction = handler;}
 }

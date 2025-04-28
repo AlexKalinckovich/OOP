@@ -181,7 +181,7 @@ public class MouseDrawStrategy implements DrawStrategy {
     @Override
     public void undo() {
         if (!drawingHistory.empty()) {
-            Node last = drawingHistory.pop();
+            final Node last = drawingHistory.pop();
             redoHistory.push(last);
             drawingArea.getChildren().remove(last);
         }
@@ -190,7 +190,7 @@ public class MouseDrawStrategy implements DrawStrategy {
     @Override
     public void redo() {
         if (!redoHistory.empty()) {
-            Node node = redoHistory.pop();
+            final Node node = redoHistory.pop();
             drawingHistory.push(node);
             drawingArea.getChildren().add(node);
         }

@@ -46,7 +46,7 @@ public class JSONConverter {
 
 
     // Методы для преобразования Node в DTO
-    private FigureDTO convertCircleToDTO(Node node) {
+    private FigureDTO convertCircleToDTO(final Node node) {
         final Circle circle = (Circle) node;
         return new FigureDTO(
                 "Circle",
@@ -58,7 +58,7 @@ public class JSONConverter {
         );
     }
 
-    private FigureDTO convertEllipseToDTO(Node node) {
+    private FigureDTO convertEllipseToDTO(final Node node) {
         final Ellipse ellipse = (Ellipse) node;
         return new FigureDTO(
                 "Ellipse",
@@ -204,7 +204,7 @@ public class JSONConverter {
         return result;
     }
 
-    public Optional<Node> dtoToNode(FigureDTO dto) {
+    public Optional<Node> dtoToNode(final FigureDTO dto) {
         Optional<Node> result = Optional.empty();
         final Function<FigureDTO, Node> converter = dtoToNodeMap.get(dto.type());
         if (converter != null) {

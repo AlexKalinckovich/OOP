@@ -11,14 +11,14 @@ public class FigureSettings {
     private List<Double> dashPattern = null;
 
     public Paint getFillColor() { return fillColor; }
-    public void setFillColor(Paint fillColor) { this.fillColor = fillColor; }
+    public void setFillColor(final Paint fillColor) { this.fillColor = fillColor; }
 
     public Paint getStrokeColor() { return strokeColor; }
-    public void setStrokeColor(Paint strokeColor) { this.strokeColor = strokeColor; }
+    public void setStrokeColor(final Paint strokeColor) { this.strokeColor = strokeColor; }
 
     public double getStrokeWidth() { return strokeWidth; }
-    public void setStrokeWidth(double strokeWidth) { this.strokeWidth = strokeWidth; }
+    public void setStrokeWidth(final double strokeWidth) { this.strokeWidth = strokeWidth; }
 
     public List<Double> getDashPattern() { return dashPattern; }
-    public void setDashPattern(List<Double> dashPattern) { this.dashPattern = dashPattern; }
+    public void setDashPattern(final List<Double> dashPattern) { this.dashPattern = dashPattern; }
 }

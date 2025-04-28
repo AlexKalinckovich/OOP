@@ -68,7 +68,7 @@ public class ControlPanel {
     /**
      * Выбирает фигуру по имени и вызывает обработчик события.
      */
-    public void selectFigure(String figureName) {
+    public void selectFigure(final String figureName) {
         figureSelector.getSelectionModel().select(figureName);
         if (onFigureSelected != null)
             onFigureSelected.accept(figureName);
@@ -76,15 +76,15 @@ public class ControlPanel {
 
     // Методы для назначения обработчиков событий
 
-    public void setOnFigureSelected(Consumer<String> handler) {
+    public void setOnFigureSelected(final Consumer<String> handler) {
         this.onFigureSelected = handler;
     }
 
-    public void setOnDrawAction(Runnable handler) {
+    public void setOnDrawAction(final Runnable handler) {
         this.onDrawAction = handler;
     }
 
-    public void setOnResetAction(Runnable handler) {
+    public void setOnResetAction(final Runnable handler) {
         this.onResetAction = handler;
     }
 
